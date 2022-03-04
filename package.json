@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/EvanCWoods/alpaca-trading#readme",
   "dependencies": {
-    "express": "^4.17.3"
+    "@alpacahq/alpaca-trade-api": "^2.12.1",
+    "express": "^4.17.3",
+    "lodash": "^4.17.21",
+    "technicalindicators": "^3.1.0"
   }
 }
