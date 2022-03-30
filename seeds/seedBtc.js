@@ -1,7 +1,7 @@
 const csv = require("csv-parser");
 const fs = require("fs");
 const path = "../data";
-const BTC = require("../models");
+const {BTC} = require("../models");
 
 let data = [];
 

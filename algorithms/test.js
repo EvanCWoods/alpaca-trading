@@ -1,5 +1,5 @@
 const fs =require("fs");
-const BTC = require("../models");
+const {BTC} = require("../models");
 
 
 const getData = async () => {
@@ -59,9 +59,11 @@ const signals = async () => {
 const main = async () => {
     const data = await signals();
     console.log(data);
-    for (let i= 0; i < data.length; i++) {
-        
-    }
+        fs.appendFile("data.json", JSON.stringify(data), (err) => {
+            if (err) {
+                console.log(err);
+            } 
+        });
 }
 
 main();
