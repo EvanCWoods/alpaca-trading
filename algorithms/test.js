@@ -1,3 +1,4 @@
+const fs =require("fs");
 const BTC = require("../models");
 
 
@@ -16,11 +17,11 @@ const getData = async () => {
     return dataList;
 };
 
-const useData = async () => {
+const getMA = async () => {
     let sma = [];
     const data = await getData();
     for (let i = 9; i < data.length; i++) {
-        sma.push(
+        sma.push((
             data[i].close + 
             data[i-1].close + 
             data[i-2].close + 
@@ -31,9 +32,36 @@ const useData = async () => {
             data[i-7].close + 
             data[i-8].close + 
             data[i-9].close
-            ) / 10;
+            ) / 10);
     }
-    console.log(sma);
+    return sma;
 }
 
-useData();
+const signals = async () => {
+    let buyArray = [];
+    let sellArray = [];
+    // Get the sma and the raw data objects
+    const sma = await getMA()
+    let data = await getData();
+    // cut the first 10 data points to match the sma length
+    let cutData = data.splice(9);
+
+    // loop through all data and return values of interest
+    for (let i = 0; i < cutData.length; i++) {
+        if ((cutData[i].close > sma[i] && sma[i] - sma[i-3] > 10)) {
+            buyArray.push(cutData[i]);
+        }
+    }
+    return buyArray;
+}
+
+
+const main = async () => {
+    const data = await signals();
+    console.log(data);
+    for (let i= 0; i < data.length; i++) {
+        
+    }
+}
+
+main();

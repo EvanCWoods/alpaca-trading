@@ -10,6 +10,7 @@ fs.createReadStream("seeds/BTC-AUD.csv")
   .on("data", (row) => {
     data.push(
         {
+            date: row.Date,
             open: row.Open,
             high: row.High,
             low: row.Low,

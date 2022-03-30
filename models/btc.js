@@ -11,6 +11,10 @@ BTC.init(
       primaryKey: true,
       autoIncrement: true,
     },
+    date: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     high: {
       type: DataTypes.DOUBLE,
       allowNull: false,
