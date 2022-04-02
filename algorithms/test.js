@@ -59,11 +59,11 @@ const signals = async () => {
 const main = async () => {
     const data = await signals();
     console.log(data);
-        fs.appendFile("data.json", JSON.stringify(data), (err) => {
-            if (err) {
-                console.log(err);
-            } 
-        });
+        // fs.appendFile("data.json", JSON.stringify(data), (err) => {
+        //     if (err) {
+        //         console.log(err);
+        //     } 
+        // });
 }
 
 main();
