@@ -2,6 +2,7 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 
+# get the data from the CSV file
 def getData():
   file = open("BTC-USD.csv")
   data = csv.reader(file)
@@ -25,21 +26,61 @@ def getData():
   return rows
 
 
-def showData():
+# Average the data
+def average():
   close = []
 
   data = getData()
   for element in data:
     close.append(element.get("Close"))
 
-  x = np.arange(0, len(close))
-  plt.plot(x, close)
-  plt.show()
+    x = np.arange(0, len(data))
+
+
+  window_size = 10
+  
+  i = 0
+  # Initialize an empty list to store moving averages
+  moving_averages = [0,0,0,0,0,0,0,0,0]
+  
+  # Loop through the array to consider
+  # every window of size 3
+  while i < len(close) - window_size + 1:
+    
+    # Store elements from i to i+window_size
+    # in list to get the current window
+    window = close[i : i + window_size]
+  
+    # Calculate the average of current window
+    window_average = round(sum(window) / window_size, 2)
+      
+    # Store the average of current
+    # window in moving average list
+    moving_averages.append(window_average)
+    
+    # Shift window to right by one position
+    i += 1
+
+  # showData(x, close, moving_averages)
+  return moving_averages
+  
+
+# Show the data
+def showData(x,y, average=None):
+  if (average != None):
+    plt.figure(figsize=(15, 8))
+    plt.plot(x, y)
+    plt.plot(x, average)
+    plt.show()
+  else:
+    plt.figure(figsize=(15, 8))
+    plt.plot(x, y)
+    plt.show()
   
 
 
 def main():
-  showData()
+  average()
 
 
 if (__name__ == "__main__"):
