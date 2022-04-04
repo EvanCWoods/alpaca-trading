@@ -103,7 +103,6 @@ def get_bollinger_bands(prices, rate=20):
 
 bollinger_up, bollinger_down = get_bollinger_bands(getClose())
 
-print(len(bollinger_up), len(bollinger_down))
 
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
@@ -111,6 +110,7 @@ plt.ylabel('Closing Prices')
 plt.plot(getClose()[-300:], label='Closing Prices')
 plt.plot(bollinger_up[-300:], label='Bollinger Up', c='g')
 plt.plot(bollinger_down[-300:], label='Bollinger Down', c='g')
+plt.plot(get_sma(getClose(), 20)[-300:], label='SMA20', c='b')
 plt.legend()
 plt.show()
 
