@@ -106,9 +106,11 @@ sma = get_sma(getClose(), 20)
 
 
 # Function to get buy signals
-def buy(spot_price, sma, bollinger_up, bollinger_down):
+def buySell(spot_price, sma, bollinger_up, bollinger_down):
   buys = []
-  price = []
+  sells = []
+  buy_price = []
+  sell_price = []
   spot_price = np.array(spot_price).flatten()
   sma = np.array(sma).flatten()
   bollinger_up = np.array(bollinger_up).flatten()
@@ -117,22 +119,29 @@ def buy(spot_price, sma, bollinger_up, bollinger_down):
   n = 0
   while n < 20:
     buys.append(None)
-    price.append(None)
+    buy_price.append(None)
+    sell_price.append(None)
+    sells.append(None)
     n+=1
   # Loop through and check if the spot price is lower than the bottom bollinger band (starting at 20 for consistency of data location)
   i = 0
   while (i < len(spot_price)):
     if (spot_price[i] < bollinger_down[i]):
       buys.append(i)
-      price.append(spot_price[i])
+      buy_price.append(spot_price[i])
+    elif (spot_price[i] > bollinger_up[i]):
+      sells.append(i)
+      sell_price.append(spot_price[i])
     else:
-      price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
+      buy_price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
+      sell_price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
       buys.append(None)  # if the price is not above the bottom bollinger band add None to the index (x)
+      sells.append(None)
     i+=1
   
-  return buys, price
+  return buys, sells, buy_price, sell_price
 
-buys, price = buy(getClose(), sma, bollinger_up, bollinger_down)
+buys, sells, buy_price, sell_price = buySell(getClose(), sma, bollinger_up, bollinger_down)
 
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
@@ -141,7 +150,8 @@ plt.plot(getClose()[-300:], label='Closing Prices', c="#000000")
 plt.plot(bollinger_up[-300:], label='Bollinger Up', c='#33C7FF', linewidth=1)
 plt.plot(bollinger_down[-300:], label='Bollinger Down', c='#33C7FF', linewidth=1)
 plt.plot(get_sma(getClose()[-300:], 20), label='SMA20', c='#808080', linewidth=1)
-plt.scatter(buys[-300:], price[-300:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
+plt.scatter(buys[-300:], buy_price[-300:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
+plt.scatter(sells[-300:], sell_price[-300:], marker="v", c="r", label="sells, spot price") # add ^ smbols when on buy signal 
 plt.legend()
 plt.show()
 
