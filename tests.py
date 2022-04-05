@@ -102,15 +102,50 @@ def get_bollinger_bands(prices, rate=20):
 
 
 bollinger_up, bollinger_down = get_bollinger_bands(getClose())
+sma = get_sma(getClose(), 20)
+
+
+# Function to get buy signals
+def buy(spot_price, sma, bollinger_up, bollinger_down):
+  buys = []
+  price = []
+  spot_price = np.array(spot_price[20:]).flatten()
+  sma = np.array(sma[20:]).flatten()
+  bollinger_up = np.array(bollinger_up[20:]).flatten()
+  bollinger_down = np.array(bollinger_down[20:]).flatten()
+
+  n = 0
+  while n < 20:
+    buys.append(None)
+    price.append(None)
+    n+=1
+  # Loop through and check if the spot price is lower than the bottom bollinger band (starting at 20 for consistency of data location)
+  i = 0
+  while (i < len(spot_price)):
+    if (spot_price[i] < bollinger_down[i]):
+      buys.append(i)
+      price.append(spot_price[i])
+    else:
+      price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
+      buys.append(None)  # if the price is not above the bottom bollinger band add None to the index (x)
+    i+=1
+  
+  return buys, price
+
+buys, price = buy(getClose(), sma, bollinger_up, bollinger_down)
+
+print(len(buys), len(price), len(sma), len(bollinger_up), len(bollinger_down))
+
 
 
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
 plt.ylabel('Closing Prices')
-plt.plot(getClose()[-300:], label='Closing Prices')
-plt.plot(bollinger_up[-300:], label='Bollinger Up', c='g')
-plt.plot(bollinger_down[-300:], label='Bollinger Down', c='g')
-plt.plot(get_sma(getClose(), 20)[-300:], label='SMA20', c='b')
+plt.plot(getClose()[-300:], label='Closing Prices', c="#000000")
+plt.plot(bollinger_up[-300:], label='Bollinger Up', c='#33C7FF', linewidth=1)
+plt.plot(bollinger_down[-300:], label='Bollinger Down', c='#33C7FF', linewidth=1)
+plt.plot(get_sma(getClose()[-300:], 20), label='SMA20', c='#808080', linewidth=1)
+plt.scatter(buys[-300:], price[-300:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
 plt.legend()
 plt.show()
 
@@ -119,6 +154,7 @@ def main():
   y = getClose()
   x = np.arange(0, len(y))
   # showData(x, y, bollinger_down, bollinger_up)
+
 
 
 if (__name__ == "__main__"):
