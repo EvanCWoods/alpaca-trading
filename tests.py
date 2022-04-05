@@ -109,10 +109,10 @@ sma = get_sma(getClose(), 20)
 def buy(spot_price, sma, bollinger_up, bollinger_down):
   buys = []
   price = []
-  spot_price = np.array(spot_price[20:]).flatten()
-  sma = np.array(sma[20:]).flatten()
-  bollinger_up = np.array(bollinger_up[20:]).flatten()
-  bollinger_down = np.array(bollinger_down[20:]).flatten()
+  spot_price = np.array(spot_price).flatten()
+  sma = np.array(sma).flatten()
+  bollinger_up = np.array(bollinger_up).flatten()
+  bollinger_down = np.array(bollinger_down).flatten()
 
   n = 0
   while n < 20:
@@ -133,10 +133,6 @@ def buy(spot_price, sma, bollinger_up, bollinger_down):
   return buys, price
 
 buys, price = buy(getClose(), sma, bollinger_up, bollinger_down)
-
-print(len(buys), len(price), len(sma), len(bollinger_up), len(bollinger_down))
-
-
 
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
