@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # GLOBAL VARIABLES
-FILE = "BTC-Hourly.csv"
+FILE = "raw-data/BTC-Hourly.csv"
 RATE = 20
 HISTORY = 1000
 
