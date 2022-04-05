@@ -4,9 +4,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# GLOBAL VARIABLES
+FILE = "BTC-Hourly.csv"
+RATE = 20
+HISTORY = 1000
+
 # get the data from the CSV file
 def getData():
-  file = open("BTC-Hourly.csv")
+  file = open(FILE)
   data = csv.reader(file)
 
   headers = []
@@ -38,11 +43,12 @@ def getClose():
 
   return pd.DataFrame(close)
 
+close = getClose()
+
  
 #  Get the average of a given window
 def getAverage(windowSize):
-  data = getClose()
-  x = np.arange(0, len(data))
+  x = np.arange(0, len(close))
   moving_averages = []
 
   n = 0
@@ -53,11 +59,11 @@ def getAverage(windowSize):
   i = 0  
   # Loop through the array to consider
   # every window of size 3
-  while i < len(data) - windowSize + 1:
+  while i < len(close) - windowSize + 1:
     
     # Store elements from i to i+window_size
     # in list to get the current window
-    window = data[i : i + windowSize]
+    window = close[i : i + windowSize]
   
     # Calculate the average of current window
     window_average = round(sum(window) / windowSize, 2)
@@ -75,7 +81,7 @@ def getAverage(windowSize):
 def get_sma(prices, rate):
     return prices.rolling(rate).mean()
 
-def get_bollinger_bands(prices, rate=20):
+def get_bollinger_bands(prices, rate=RATE):
     sma = get_sma(prices, rate)
     std = prices.rolling(rate).std()
     bollinger_up = sma + std * 2 # Calculate top band
@@ -84,7 +90,7 @@ def get_bollinger_bands(prices, rate=20):
 
 
 bollinger_up, bollinger_down = get_bollinger_bands(getClose())
-sma = get_sma(getClose(), 20)
+sma = get_sma(getClose(), RATE)
 
 
 
@@ -111,10 +117,13 @@ def rsiIndex(periods = 10, ema = True):
 
 # Function to get buy signals
 def buySell(spot_price, sma, bollinger_up, bollinger_down):
+  # Arrays to store buyy/sell indexes, buy/sell prices to be plotted later
   buys = []
   sells = []
   buy_price = []
   sell_price = []
+
+  # Preprocess the data to be single dimension numpy arrays
   spot_price = np.array(spot_price).flatten()
   sma = np.array(sma).flatten()
   bollinger_up = np.array(bollinger_up).flatten()
@@ -123,19 +132,21 @@ def buySell(spot_price, sma, bollinger_up, bollinger_down):
   ema13 = np.array(pd.DataFrame(spot_price).ewm(span=13, adjust=False).mean()).flatten()
   ema26 = np.array(pd.DataFrame(spot_price).ewm(span=26, adjust=False).mean()).flatten()
 
+  # Add None values to each array up to the point where the moving average is created (RATE value)
   n = 0
-  while n < 20:
+  while n < RATE:
     buys.append(None)
     buy_price.append(None)
     sell_price.append(None)
     sells.append(None)
     n+=1
-  # Loop through and check if the spot price is lower than the bottom bollinger band (starting at 20 for consistency of data location)
-  i = 20
+  i = RATE
   while (i < len(spot_price)):
+      # Get buy signals if the spot price is lower than the bottom bollinger band, rsi is lower than 30, and the 13 ema is below the 26 ema
     if (spot_price[i] < bollinger_down[i] and rsi[i] < 30 and ema13[i] < ema26[i]):
       buys.append(i)
       buy_price.append(spot_price[i])
+      # Get sell signals if the spot price is higher than the upper bollinger band, rsi is above 70, and the 13 ema is above the 26 ema
     elif (spot_price[i] > bollinger_up[i] and rsi[i] > 70 and ema13[i-1] > ema26[i-1]):
       sells.append(i)
       sell_price.append(spot_price[i])
@@ -143,30 +154,29 @@ def buySell(spot_price, sma, bollinger_up, bollinger_down):
       buy_price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
       sell_price.append(None) # if the price is not above the bottom bollinger band add  None to the price (y)
       buys.append(None)  # if the price is not above the bottom bollinger band add None to the index (x)
-      sells.append(None)
+      sells.append(None) # if the price is not above the bottom bollinger band add None to the index (x)
     i+=1
   
   return buys, sells, buy_price, sell_price
 
-buys, sells, buy_price, sell_price = buySell(getClose(), sma, bollinger_up, bollinger_down)
+
+buys, sells, buy_price, sell_price = buySell(close, sma, bollinger_up, bollinger_down)
 
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
 plt.ylabel('Closing Prices')
-plt.plot(getClose()[-1000:], label='Closing Prices', c="#000000")
-plt.plot(bollinger_up[-1000:], label='Bollinger Up', c='#33C7FF', linewidth=1)
-plt.plot(bollinger_down[-1000:], label='Bollinger Down', c='#33C7FF', linewidth=1)
-plt.plot(get_sma(getClose()[-1000:], 20), label='SMA20', c='#808080', linewidth=1)
-plt.scatter(buys[-1000:], buy_price[-1000:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
-plt.scatter(sells[-1000:], sell_price[-1000:], marker="v", c="r", label="sells, spot price") # add v smbols when on sell signal 
+plt.plot(close[-HISTORY:], label='Closing Prices', c="#000000")
+plt.plot(bollinger_up[-HISTORY:], label='Bollinger Up', c='#33C7FF', linewidth=1)
+plt.plot(bollinger_down[-HISTORY:], label='Bollinger Down', c='#33C7FF', linewidth=1)
+plt.plot(get_sma(close[-HISTORY:], RATE), label='SMA20', c='#808080', linewidth=1)
+plt.scatter(buys[-HISTORY:], buy_price[-HISTORY:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
+plt.scatter(sells[-HISTORY:], sell_price[-HISTORY:], marker="v", c="r", label="sells, spot price") # add v smbols when on sell signal 
 plt.legend()
 plt.show()
 
 
 def main():
-  y = getClose()
-  x = np.arange(0, len(y))
-  # showData(x, y, bollinger_down, bollinger_up)
+  return
 
 
 
