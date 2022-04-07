@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 
 # GLOBAL VARIABLES
-FILE = "BTC-Hourly.csv"
+FILE = "raw-data/BTC-Hourly.csv"
 RATE = 20
-HISTORY = 1000
+HISTORY = 72
 
 # get the data from the CSV file
 def getData():
@@ -165,14 +165,14 @@ buys, sells, buy_price, sell_price = buySell(close, sma, bollinger_up, bollinger
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
 plt.ylabel('Closing Prices')
-plt.plot(close[-HISTORY:], label='Closing Prices', c="#000000")
-plt.plot(bollinger_up[-HISTORY:], label='Bollinger Up', c='#33C7FF', linewidth=1)
-plt.plot(bollinger_down[-HISTORY:], label='Bollinger Down', c='#33C7FF', linewidth=1)
-plt.plot(get_sma(close[-HISTORY:], RATE), label='SMA20', c='#808080', linewidth=1)
-plt.scatter(buys[-HISTORY:], buy_price[-HISTORY:], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
-plt.scatter(sells[-HISTORY:], sell_price[-HISTORY:], marker="v", c="r", label="sells, spot price") # add v smbols when on sell signal 
+plt.plot(close[:HISTORY], label='Closing Prices', c="#000000")
+plt.plot(bollinger_up[:HISTORY], label='Bollinger Up', c='#33C7FF', linewidth=1)
+plt.plot(bollinger_down[:HISTORY], label='Bollinger Down', c='#33C7FF', linewidth=1)
+plt.plot(get_sma(close[:HISTORY], RATE), label='SMA20', c='#808080', linewidth=1)
+plt.scatter(buys[:HISTORY], buy_price[:HISTORY], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
+plt.scatter(sells[:HISTORY], sell_price[:HISTORY], marker="v", c="r", label="sells, spot price") # add v smbols when on sell signal 
 plt.legend()
-plt.show()
+plt.savefig("public/images/btc-1h.png")
 
 
 def main():
