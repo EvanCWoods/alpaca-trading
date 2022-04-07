@@ -7,7 +7,7 @@ import pandas as pd
 # GLOBAL VARIABLES
 FILE = "raw-data/BTC-Hourly.csv"
 RATE = 20
-HISTORY = 72
+HISTORY = 700
 
 # get the data from the CSV file
 def getData():
@@ -143,11 +143,11 @@ def buySell(spot_price, sma, bollinger_up, bollinger_down):
   i = RATE
   while (i < len(spot_price)):
       # Get buy signals if the spot price is lower than the bottom bollinger band, rsi is lower than 30, and the 13 ema is below the 26 ema
-    if (spot_price[i] < bollinger_down[i] and rsi[i] < 30 and ema13[i] < ema26[i]):
+    if ((spot_price[i-1] < bollinger_down[i-1] and spot_price[i] >= bollinger_down[i]) and (rsi[i] < 30)): #and (rsi[i-1] < 28 and rsi[i-1] < rsi[i]) and ema13[i] < ema26[i]):
       buys.append(i)
       buy_price.append(spot_price[i])
       # Get sell signals if the spot price is higher than the upper bollinger band, rsi is above 70, and the 13 ema is above the 26 ema
-    elif (spot_price[i] > bollinger_up[i] and rsi[i] > 70 and ema13[i-1] > ema26[i-1]):
+    elif (spot_price[i] > bollinger_up[i] and rsi[i] > 72 and ema13[i] > ema26[i]):
       sells.append(i)
       sell_price.append(spot_price[i])
     else:
@@ -161,7 +161,10 @@ def buySell(spot_price, sma, bollinger_up, bollinger_down):
 
 
 buys, sells, buy_price, sell_price = buySell(close, sma, bollinger_up, bollinger_down)
+ema13 = np.array(pd.DataFrame(np.array(getClose()).flatten()).ewm(span=13, adjust=False).mean()).flatten()
+ema26 = np.array(pd.DataFrame(np.array(getClose()).flatten()).ewm(span=26, adjust=False).mean()).flatten()
 
+plot1 = plt.figure(1)
 plt.title("BTC" + ' Bollinger Bands')
 plt.xlabel('Days')
 plt.ylabel('Closing Prices')
@@ -172,7 +175,19 @@ plt.plot(get_sma(close[:HISTORY], RATE), label='SMA20', c='#808080', linewidth=1
 plt.scatter(buys[:HISTORY], buy_price[:HISTORY], marker="^", c="g", label="buys, spot price") # add ^ smbols when on buy signal 
 plt.scatter(sells[:HISTORY], sell_price[:HISTORY], marker="v", c="r", label="sells, spot price") # add v smbols when on sell signal 
 plt.legend()
-plt.savefig("public/images/btc-1h.png")
+
+plot2 = plt.figure(2)
+plt.title("MACD")
+plt.plot(np.arange(0, HISTORY), ema13[:HISTORY])
+plt.plot(np.arange(0, HISTORY), ema26[:HISTORY])
+
+plt3 = plt.figure(3)
+plt.title("RSI")
+plt.plot(np.arange(0, HISTORY), np.array([72] * HISTORY), c="b")
+plt.plot(np.array(rsiIndex()).flatten()[:HISTORY:])
+plt.plot(np.arange(0, HISTORY), np.array([28] * HISTORY), c="b")
+plt.show()
+# plt.savefig("public/images/btc-1h.png")
 
 
 def main():
