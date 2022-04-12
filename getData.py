@@ -1,14 +1,15 @@
 import time
 import requests
-
+from decouple import config
 
 # GLOBAL VARIABLES
 HOUR = 3600
+API_ENDPOINT = config("API_ENDPOINT")
 
 
 # Function to get the data from the api
 def getDataFeed():
-    data = requests.get("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD")
+    data = requests.get(API_ENDPOINT)
     return data.json()
 
 
