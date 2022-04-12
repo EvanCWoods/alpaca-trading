@@ -2,14 +2,18 @@ from pymongo import MongoClient
 import csv
 import numpy as np
 import pandas as pd
+from decouple import config
+
+FILE = config("DATA")
 
 client = MongoClient("localhost", 27017)
 
 db = client["myDatabase"]
 collection = db["raw-data"]
 
+print(FILE)
 
-file = open("./raw-data/BTC-Hourly.csv")
+file = open(f"./{FILE}")
 data = csv.reader(file)
 
 # Remove the header text from the file

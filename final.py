@@ -3,12 +3,10 @@ import numpy as np
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
+from decouple import config
 
 # GLOBAL VARIABLES
-FILE = "raw-data/BTC-Hourly.csv"
-AVERAGE_LENGTH = 20
-WINDOW_SIZE = 500
-
+FILE = config("DATA")
 
 # Function to get the data from the file
 def getData(source):
