@@ -28,40 +28,47 @@ def getData(source):
     return pd.DataFrame(rows[::-1])  # Reverse the data to be past -> present
 
 
+# Function to get the simple moving average
 def getMa(prices, rate):
     return prices.rolling(rate).mean()
 
-
-def testStrategy(signal, prices):
+# Function to test the strategy
+def testStrategy(average, prices):
     CASH = 100
     BUY = True
     SELL = False
     i = 0
     while i < len(prices) and BUY == True:
-        if (prices[i - 1] < signal[i - 1] and prices[i] > signal[i]):
+        if (prices[i - 1] < average[i - 1] and prices[i] > average[i]):
             buyPrice = prices[i]
             BUY = False
             SELL = True
             n = i
             while n < len(prices) and SELL == True:
-                if (prices[n - 1] > signal[n - 1] and prices[n] < signal[n]):
+                if (prices[n - 1] > average[n - 1] and prices[n] < average[n]):
                     sellPrice = prices[n]
                     BUY = True
                     SELL = False
-                    CASH = CASH * 1 + (sellPrice - buyPrice) / buyPrice
-                    print({"CASH": CASH, "buyPrice": buyPrice, "sellPrice": sellPrice})
+                    roi = 1 + (sellPrice - buyPrice) / buyPrice
+                    CASH = CASH * roi
+                    print({"CASH": CASH, "buyPrice": buyPrice, "sellPrice": sellPrice, "ROI": roi, "Buy Index": i, "Sell Index": n})
                 n += 1
             i = n
         i += 1
-    return CASH, i
+    summary = {"STARTING BALANCE": 100, "ENDING BALANCE": CASH, "PROFIT": CASH - 100, "ROI": (CASH / 100) * 100}
+    return CASH, i, summary
 
 
 # Main function
 def main():
+    print()
+    print()
     print(
         testStrategy(
-            np.array(getMa(getData(FILE), 20)).flatten(),
+            np.array(getMa(getData(FILE), 200)).flatten(),
             np.array(getData(FILE)).flatten()))
+    print()
+    print()
 
 
 if (__name__ == "__main__"):
