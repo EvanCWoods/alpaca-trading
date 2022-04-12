@@ -1,0 +1,2 @@
+Possible API for getting live data:
+* https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD
